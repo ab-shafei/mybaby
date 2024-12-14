@@ -1,0 +1,114 @@
+// Prisma schema file
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql" // Replace with your DB provider
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            Int      @id @default(autoincrement())
+  email         String   @unique
+  password      String
+  name          String
+  address       String?
+  phoneNumber   String?
+  dateOfBirth   String?
+  role          Role
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  manager       Manager? 
+  doctor        Doctor?
+  parent        Parent?
+  complaint    Complaint[]
+  guidance    Guidance[]
+}
+
+model Manager {
+  id      Int   @id @default(autoincrement())
+  userId  Int   @unique
+  user    User  @relation(fields: [userId], references: [id])
+  
+  department String?
+
+  healthUnit HealthUnit[]
+  complaint  Complaint[]
+}
+
+model Doctor {
+  id            Int    @id @default(autoincrement())
+  userId        Int    @unique
+  user          User   @relation(fields: [userId], references: [id])
+  specialization String
+  gender           String
+  image          String?
+
+  guidance  Guidance[]
+}
+
+model Parent {
+  id           Int    @id @default(autoincrement())
+  userId       Int    @unique
+  user         User   @relation(fields: [userId], references: [id])
+  // Parent can have multiple children
+  children     Child[]
+}
+
+model Child {
+  id           Int    @id @default(autoincrement())
+  name         String
+  gender       String
+  age          String
+  dateOfPirth  String
+  bloodType    String
+  chronicdisease String?
+  parentId     Int
+  parent       Parent @relation(fields: [parentId], references: [id])
+}
+
+enum Role {
+  MANAGER
+  DOCTOR
+  PARENT
+}
+
+
+// Health Unit Model
+model HealthUnit {
+  id          Int       @id @default(autoincrement())
+  name        String
+  address     String
+  phone       String
+  image       String?
+  managerId   Int
+  manager     Manager @relation(fields: [managerId], references: [id])
+}
+
+// Complaint Model
+model Complaint {
+  id          Int       @id @default(autoincrement())
+  title       String
+  description String
+  issue       String
+  resolution  String?
+  date        DateTime
+  userId      Int
+  managerId     Int?
+  user        User      @relation(fields: [userId], references: [id])
+  manager       Manager? @relation(fields: [managerId], references: [id])
+}
+
+// Guidance Model
+model Guidance {
+  id          Int       @id @default(autoincrement())
+  title       String
+  description String
+  date        DateTime
+  doctorId    Int
+  doctor      Doctor    @relation(fields: [doctorId], references: [id])
+  users       User[]
+}
