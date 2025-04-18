@@ -8,6 +8,7 @@ import morgan from "morgan";
 import "dotenv/config";
 
 import authRoutes from "./routes/authRoutes";
+import appointmentRoutes from "./routes/appointmentRoutes";
 
 import path from "path";
 import { notFound } from "./controllers/notFoundController";
@@ -31,6 +32,7 @@ app.use(morgan("combined"));
 app.use("/api/auth", authRoutes);
 
 // Routes
+app.use("/api/appointements", appointmentRoutes);
 
 // Error Handling
 app.use(errorHandler);
