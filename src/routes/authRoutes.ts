@@ -1,15 +1,14 @@
 import { Router } from "express";
 import {
-  register,
-  login,
-  changeUserPassword,
+  signup,
+  signin,
+  requestRefreshIdToken,
 } from "../controllers/authController";
-import { authenticateJWT } from "../middlewares/authMiddleware";
 
 const router = Router();
 
-router.post("/register", register);
-router.post("/login", login);
-router.post("/change-password", authenticateJWT, changeUserPassword);
+router.post("/signup", signup);
+router.post("/signin", signin);
+router.post("/token", requestRefreshIdToken);
 
 export default router;

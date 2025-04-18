@@ -7,6 +7,7 @@ COPY prisma ./prisma
 COPY package.json .
 COPY package-lock.json .
 COPY tsconfig.json .
+COPY serviceAccountKey.json .
 
 RUN apk add --no-cache openssl bash
 

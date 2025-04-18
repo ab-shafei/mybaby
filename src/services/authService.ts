@@ -1,107 +1,46 @@
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
-import prisma from "../utils/prismaClient";
-import { validatePassword } from "../utils/validate";
-import { AppError } from "../middlewares/AppError";
-import { Role } from "@prisma/client";
+import { auth } from "../utils/firebase";
+import axios from "axios";
 
-const JWT_SECRET = process.env.JWT_SECRET || "secret";
+export const signupUser = async (email: string, password: string) => {
+  const userRecord = await auth.createUser({ email, password });
 
-export const registerUser = async (
-  email: string,
-  password: string,
-  name: string,
-  phoneNumber: string,
-  role: Role
-) => {
-  // Check if the email is already registered
-  const existingUserByEmail = await prisma.user.findUnique({
-    where: { email },
-  });
-  if (existingUserByEmail) {
-    throw new AppError(400, "Email is already registered");
-  }
-
-  //   // Check if the phone number is already registered
-  const existingUserByPhone = await prisma.user.findFirst({
-    where: { phoneNumber },
-  });
-  if (existingUserByPhone) {
-    throw new AppError(400, "Phone number is already registered");
-  }
-
-  const hashedPassword = await bcrypt.hash(password, 10);
-
-  const user = await prisma.user.create({
-    data: {
-      email,
-      password: hashedPassword,
-      name,
-      phoneNumber,
-      role,
-    },
-  });
-
-  return user;
+  return userRecord;
 };
 
-export const loginUser = async (email: string, password: string) => {
-  const user = await prisma.user.findUnique({ where: { email } });
-  if (!user) throw new AppError(404, "User not found");
-
-  const isPasswordValid = await bcrypt.compare(password, user.password);
-  if (!isPasswordValid) throw new AppError(400, "Invalid credentials");
-
-  const token = jwt.sign(
+export const signinUser = async (email: string, password: string) => {
+  const response = await axios.post(
+    `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${process.env.FIREBASE_API_KEY}`,
     {
-      user: {
-        id: user.id,
-        role: user.role,
-      },
-    },
-    JWT_SECRET,
-    {
-      expiresIn: "365d",
+      email,
+      password,
+      returnSecureToken: true,
     }
   );
-  return { token, user };
+
+  return {
+    idToken: response.data.idToken,
+    refreshToken: response.data.refreshToken,
+    expiresIn: response.data.expiresIn,
+  };
 };
 
-export const changePassword = async (
-  id: number,
-  {
-    oldPassword,
-    newPassword,
-  }: {
-    oldPassword: string;
-    newPassword: string;
-  }
-) => {
-  const user = await prisma.user.findUnique({
-    where: { id },
-  });
-  if (!user) {
-    throw new AppError(404, "User not found");
-  }
-  const isPasswordValid = await bcrypt.compare(oldPassword, user.password);
-  if (!isPasswordValid) throw new AppError(400, "Wrong password");
+export const refreshIdToken = async (refreshToken: string) => {
+  const response = await axios.post(
+    `https://securetoken.googleapis.com/v1/token?key=${process.env.FIREBASE_API_KEY}`,
+    new URLSearchParams({
+      grant_type: "refresh_token",
+      refresh_token: refreshToken,
+    }),
+    {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    }
+  );
 
-  // Validate the password strength
-  if (!validatePassword(newPassword)) {
-    throw new AppError(
-      400,
-      "Password must be at least 8 characters long and include at least one letter and one number"
-    );
-  }
-
-  const hashedPassword = await bcrypt.hash(newPassword, 10);
-
-  await prisma.user.update({
-    where: {
-      id,
-    },
-    data: {
-      password: hashedPassword,
-    },
-  });
+  return {
+    idToken: response.data.id_token,
+    refreshToken: response.data.refresh_token,
+    expiresIn: response.data.expires_in,
+  };
 };
