@@ -32,3 +32,16 @@ export const createAppointment = async ({
 
   return appointmenmtRecord;
 };
+
+export const deleteAppointment = async ({
+  appointmentId,
+}: {
+  appointmentId: string;
+}) => {
+  const appointmenmtRecord = db
+    .collection("appointments")
+    .doc(appointmentId)
+    .delete();
+
+  return appointmenmtRecord;
+};

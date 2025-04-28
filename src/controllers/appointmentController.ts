@@ -1,5 +1,8 @@
 import { Request, Response, NextFunction } from "express";
-import { createAppointment } from "../services/appointmentService";
+import {
+  createAppointment,
+  deleteAppointment,
+} from "../services/appointmentService";
 
 export const reserveAppointment = async (
   req: Request,
@@ -29,14 +32,33 @@ export const reserveAppointment = async (
       time,
       childGender,
     });
-    res
-      .status(201)
-      .json({
-        appointmenmtRecord,
-        message: "Appointment resevered successfully",
-      });
+    res.status(201).json({
+      appointmenmtRecord,
+      message: "Appointment resevered successfully",
+    });
   } catch (error) {
     console.error("Appointment Failed to be resevered", error);
+    next(error);
+  }
+};
+
+export const cancelAppointment = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  // const {user} = req.user
+  const { appointmentId } = req.params;
+  try {
+    const appointmenmtRecord = await deleteAppointment({
+      appointmentId,
+    });
+    res.status(201).json({
+      appointmenmtRecord,
+      message: "Appointment Cancelled successfully",
+    });
+  } catch (error) {
+    console.error("Appointment Failed to be cancelled", error);
     next(error);
   }
 };

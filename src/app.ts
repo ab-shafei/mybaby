@@ -9,6 +9,8 @@ import "dotenv/config";
 
 import authRoutes from "./routes/authRoutes";
 import appointmentRoutes from "./routes/appointmentRoutes";
+import childenRoutes from "./routes/childRoutes";
+import complaintsRoutes from "./routes/complaintsRoutes";
 
 import path from "path";
 import { notFound } from "./controllers/notFoundController";
@@ -33,6 +35,8 @@ app.use("/api/auth", authRoutes);
 
 // Routes
 app.use("/api/appointements", appointmentRoutes);
+app.use("/api/children", childenRoutes);
+app.use("/api/complaints", complaintsRoutes);
 
 // Error Handling
 app.use(errorHandler);
