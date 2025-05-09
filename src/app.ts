@@ -11,8 +11,6 @@ import authRoutes from "./routes/authRoutes";
 import appointmentRoutes from "./routes/appointmentRoutes";
 import childenRoutes from "./routes/childRoutes";
 import complaintsRoutes from "./routes/complaintsRoutes";
-import doctorsRoutes from "./routes/doctorRoutes";
-import clinicsRoutes from "./routes/clinicRoutes";
 
 import path from "path";
 import { notFound } from "./controllers/notFoundController";
@@ -39,8 +37,6 @@ app.use("/api/auth", authRoutes);
 app.use("/api/appointements", appointmentRoutes);
 app.use("/api/children", childenRoutes);
 app.use("/api/complaints", complaintsRoutes);
-app.use("/api/doctors", doctorsRoutes);
-app.use("/api/clinics", clinicsRoutes);
 
 // Error Handling
 app.use(errorHandler);
