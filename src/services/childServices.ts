@@ -24,21 +24,17 @@ export const createChild = async ({
   childChronicDiseases: string;
   childGender: string;
 }) => {
-  const childRecord = await db
-    .collection("users")
-    .doc(userId)
-    .collection("children")
-    .add({
-      childName,
-      guardianName,
-      nationalID,
-      childAge,
-      birthDate,
-      bloodType,
-      childHealthStatus,
-      childChronicDiseases,
-      childGender,
-    });
+  const childRecord = await db.collection("children").add({
+    childName,
+    guardianName,
+    nationalID,
+    childAge,
+    birthDate,
+    bloodType,
+    childHealthStatus,
+    childChronicDiseases,
+    childGender,
+  });
 
   return childRecord;
 };
@@ -69,11 +65,7 @@ export const updateChild = async ({
   childChronicDiseases?: string;
   childGender?: string;
 }) => {
-  const childRef = db
-    .collection("users")
-    .doc(userId)
-    .collection("children")
-    .doc(childId);
+  const childRef = db.collection("children").doc(childId);
 
   await childRef.update({
     ...(childName && { childName }),
@@ -91,18 +83,8 @@ export const updateChild = async ({
 };
 
 // Delete a child
-export const deleteChild = async ({
-  userId,
-  childId,
-}: {
-  userId: string;
-  childId: string;
-}) => {
-  const childRef = db
-    .collection("users")
-    .doc(userId)
-    .collection("children")
-    .doc(childId);
+export const deleteChild = async ({ childId }: { childId: string }) => {
+  const childRef = db.collection("children").doc(childId);
 
   await childRef.delete();
 
@@ -111,11 +93,7 @@ export const deleteChild = async ({
 
 // Get all children for a user
 export const getAllChildren = async ({ userId }: { userId: string }) => {
-  const snapshot = await db
-    .collection("users")
-    .doc(userId)
-    .collection("children")
-    .get();
+  const snapshot = await db.collection("children").get();
 
   const childrenList = snapshot.docs.map((doc) => ({
     id: doc.id,
@@ -133,12 +111,7 @@ export const getChildById = async ({
   userId: string;
   childId: string;
 }) => {
-  const childDoc = await db
-    .collection("users")
-    .doc(userId)
-    .collection("children")
-    .doc(childId)
-    .get();
+  const childDoc = await db.collection("children").doc(childId).get();
 
   if (!childDoc.exists) {
     throw new Error("Child not found");
