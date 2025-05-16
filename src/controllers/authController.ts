@@ -9,11 +9,37 @@ export const signup = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { email, password } = req.body;
+  const {
+    email,
+    password,
+    firstName,
+    lastName,
+    address,
+    phoneNumber,
+    nationalNumber,
+    birthDate,
+    gender,
+    major,
+    syndicateCardImage,
+    role,
+  } = req.body;
 
   try {
-    const userRecord = await signupUser(email, password);
-    res.status(201).json({ uid: userRecord.uid, email: userRecord.email });
+    const data = await signupUser({
+      email,
+      password,
+      firstName,
+      lastName,
+      address,
+      phoneNumber,
+      nationalNumber,
+      birthDate,
+      gender,
+      major,
+      syndicateCardImage,
+      role,
+    });
+    res.status(201).json({ data });
   } catch (error) {
     next(error);
   }

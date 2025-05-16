@@ -1,6 +1,10 @@
 import { Request, Response, NextFunction } from "express";
 import { AppError } from "./AppError";
 
+function isFirebaseError(error: any): error is { code: string } {
+  return error && typeof error.code === "string";
+}
+
 export const errorHandler = (
   err: Error,
   _req: Request,
@@ -29,6 +33,9 @@ export const errorHandler = (
     // Handle expired token errors
     statusCode = 401;
     message = "Authentication token has expired";
+  } else if (isFirebaseError(err) && err.code === "auth/email-already-exists") {
+    statusCode = 400;
+    message = "Email already exists";
   }
 
   // Send error response
