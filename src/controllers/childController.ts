@@ -57,7 +57,6 @@ export const editChild = async (
   next: NextFunction
 ) => {
   const {
-    userId,
     childId,
     childName,
     guardianName,
@@ -71,7 +70,6 @@ export const editChild = async (
 
   try {
     const updatedChildRecord = await updateChild({
-      userId,
       childId,
       childName,
       guardianName,
@@ -99,11 +97,10 @@ export const removeChild = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { userId, childId } = req.body;
+  const { childId } = req.body;
 
   try {
     const deletedChildRecord = await deleteChild({
-      userId,
       childId,
     });
 
@@ -144,10 +141,10 @@ export const fetchChildById = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { userId, childId } = req.params;
+  const { childId } = req.params;
 
   try {
-    const childData = await getChildById({ userId, childId });
+    const childData = await getChildById({ childId });
 
     res.status(200).json({
       childData,

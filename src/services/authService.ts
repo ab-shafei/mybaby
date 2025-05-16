@@ -60,7 +60,9 @@ export const signinUser = async (email: string, password: string) => {
   );
 
   const usersRef = db.collection("users");
-  const snapshot = await usersRef.where("email", "==", email).get();
+  const snapshot = (
+    await usersRef.where("email", "==", email).get()
+  ).docs[0].data();
 
   if (snapshot.empty) {
     throw new AppError(404, "User not found");

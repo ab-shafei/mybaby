@@ -25,6 +25,7 @@ export const createChild = async ({
   childGender: string;
 }) => {
   const childRecord = await db.collection("children").add({
+    userId,
     childName,
     guardianName,
     nationalID,
@@ -41,7 +42,6 @@ export const createChild = async ({
 
 // Update an existing child
 export const updateChild = async ({
-  userId,
   childId,
   childName,
   guardianName,
@@ -53,7 +53,6 @@ export const updateChild = async ({
   childChronicDiseases,
   childGender,
 }: {
-  userId: string;
   childId: string;
   childName?: string;
   guardianName?: string;
@@ -93,7 +92,10 @@ export const deleteChild = async ({ childId }: { childId: string }) => {
 
 // Get all children for a user
 export const getAllChildren = async ({ userId }: { userId: string }) => {
-  const snapshot = await db.collection("children").get();
+  const snapshot = await db
+    .collection("children")
+    .where("userId", "==", userId)
+    .get();
 
   const childrenList = snapshot.docs.map((doc) => ({
     id: doc.id,
@@ -104,13 +106,7 @@ export const getAllChildren = async ({ userId }: { userId: string }) => {
 };
 
 // Get one child by ID
-export const getChildById = async ({
-  userId,
-  childId,
-}: {
-  userId: string;
-  childId: string;
-}) => {
+export const getChildById = async ({ childId }: { childId: string }) => {
   const childDoc = await db.collection("children").doc(childId).get();
 
   if (!childDoc.exists) {
