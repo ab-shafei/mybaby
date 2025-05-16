@@ -6,3 +6,4 @@ dist
 uploads
 postgresData
 prisma/migrations/migration_lock.toml
+serviceAccountKey.json
